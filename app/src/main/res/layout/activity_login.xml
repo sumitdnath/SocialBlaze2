@@ -133,10 +133,9 @@
                 android:layout_marginRight="19dp"
                 android:text="Phone"
                 android:textAllCaps="false"
-                android:textSize="14sp"
+                android:textSize="17sp"
                 android:textColor="@android:color/background_light"
                 android:background="@drawable/buttons"
-                android:drawableStart="@drawable/phone"
                 />
 
         </RelativeLayout>

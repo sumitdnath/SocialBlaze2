@@ -233,7 +233,7 @@ public class RequestsFragment extends Fragment {
                                     else if (type.equals("sent"))
                                     {
                                         Button request_sent_btn = holder.itemView.findViewById(R.id.requests_accept_button);
-                                        request_sent_btn.setText("Request Sent");
+                                        request_sent_btn.setText("Req Sent");
 
                                         holder.itemView.findViewById(R.id.requests_cancel_button).setVisibility(View.INVISIBLE);
 

@@ -72,7 +72,8 @@
                     android:text="Accept"
                     android:textSize="16sp"
                     android:textAllCaps="false"
-                    android:background="@android:color/holo_green_light"
+                    android:background="@drawable/buttons"
+                    android:textColor="@android:color/white"
                     android:visibility="invisible"
                     />
                 <Button
@@ -83,8 +84,8 @@
                     android:layout_marginStart="10dp"
                     android:textSize="16sp"
                     android:textAllCaps="false"
-                    android:background="@android:color/holo_red_dark"
-                    android:textColor="@android:color/background_light"
+                    android:background="@drawable/buttons"
+                    android:textColor="@android:color/white"
                     android:visibility="invisible"
                     />
 
