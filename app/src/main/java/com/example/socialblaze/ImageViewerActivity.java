@@ -10,7 +10,7 @@ import com.squareup.picasso.Picasso;
 public class ImageViewerActivity extends AppCompatActivity {
 
     private ImageView imageView;
-    private  String imageUrl;
+    private String imageUrl;
 
 
     @Override

@@ -73,17 +73,15 @@ public class ChatActivity extends AppCompatActivity {
 
     private String saveCurrentTime, saveCurrentDate;
 
-    private String checker = "", myUrl = "" ;
+    private String checker = "", myUrl = "";
     private StorageTask uploadTask;
     private Uri fileUri;
 
     private ProgressDialog loadingBar;
 
 
-
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
@@ -102,8 +100,7 @@ public class ChatActivity extends AppCompatActivity {
 
         SendMessageButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 SendMessage();
             }
         });
@@ -112,8 +109,7 @@ public class ChatActivity extends AppCompatActivity {
 
         SendFilesButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 CharSequence options[] = new CharSequence[]
                         {
                                 "Images",
@@ -125,10 +121,8 @@ public class ChatActivity extends AppCompatActivity {
                 builder.setTitle("Select File");
                 builder.setItems(options, new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialogInterface, int i)
-                    {
-                        if (i == 0)
-                        {
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        if (i == 0) {
                             checker = "image";
 
                             Intent intent = new Intent();
@@ -136,8 +130,7 @@ public class ChatActivity extends AppCompatActivity {
                             intent.setType("image/*");
                             startActivityForResult(intent.createChooser(intent, "Select Image"), 438);
                         }
-                        if (i == 1)
-                        {
+                        if (i == 1) {
                             checker = "pdf";
 
                             Intent intent = new Intent();
@@ -145,8 +138,7 @@ public class ChatActivity extends AppCompatActivity {
                             intent.setType("application/pdf");
                             startActivityForResult(intent.createChooser(intent, "Select PDF File"), 438);
                         }
-                        if (i == 2)
-                        {
+                        if (i == 2) {
                             checker = "docx";
 
                             Intent intent = new Intent();
@@ -163,8 +155,7 @@ public class ChatActivity extends AppCompatActivity {
         RootRef.child("Messages").child(messageSenderID).child(messageReceiverID)
                 .addChildEventListener(new ChildEventListener() {
                     @Override
-                    public void onChildAdded(DataSnapshot dataSnapshot, String s)
-                    {
+                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                         Messages messages = dataSnapshot.getValue(Messages.class);
                         messagesList.add(messages);
 
@@ -174,36 +165,29 @@ public class ChatActivity extends AppCompatActivity {
                     }
 
                     @Override
-                    public void onChildChanged(DataSnapshot dataSnapshot, String s)
-                    {
+                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
 
                     }
 
                     @Override
-                    public void onChildRemoved(DataSnapshot dataSnapshot)
-                    {
+                    public void onChildRemoved(DataSnapshot dataSnapshot) {
 
                     }
 
                     @Override
-                    public void onChildMoved(DataSnapshot dataSnapshot, String s)
-                    {
+                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
 
                     }
 
                     @Override
-                    public void onCancelled(DatabaseError databaseError)
-                    {
+                    public void onCancelled(DatabaseError databaseError) {
 
                     }
                 });
     }
 
 
-
-
-    private void IntializeControllers()
-    {
+    private void IntializeControllers() {
         ChatToolBar = (Toolbar) findViewById(R.id.chat_toolbar);
         setSupportActionBar(ChatToolBar);
 
@@ -246,16 +230,14 @@ public class ChatActivity extends AppCompatActivity {
 
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode==438 && resultCode == RESULT_OK && data != null && data.getData() != null)
-        {
+        if (requestCode == 438 && resultCode == RESULT_OK && data != null && data.getData() != null) {
             loadingBar.setTitle("Sending File");
             loadingBar.setMessage("Please wait, we are sending that file...");
             loadingBar.setCanceledOnTouchOutside(false);
             loadingBar.show();
             fileUri = data.getData();
 
-            if (!checker.equals("image"))
-            {
+            if (!checker.equals("image")) {
 
                 StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("Document Files");
 
@@ -278,10 +260,10 @@ public class ChatActivity extends AppCompatActivity {
                                 String downloadUrl = uri.toString();
 
                                 Map messageImageBody = new HashMap();
-                                messageImageBody.put("message",downloadUrl);
-                                messageImageBody.put("name",fileUri.getLastPathSegment());
-                                messageImageBody.put("type",checker);
-                                messageImageBody.put("from",messageSenderID);
+                                messageImageBody.put("message", downloadUrl);
+                                messageImageBody.put("name", fileUri.getLastPathSegment());
+                                messageImageBody.put("type", checker);
+                                messageImageBody.put("from", messageSenderID);
                                 messageImageBody.put("to", messageReceiverID);
                                 messageImageBody.put("messageID", messagePushID);
                                 messageImageBody.put("time", saveCurrentTime);
@@ -289,8 +271,8 @@ public class ChatActivity extends AppCompatActivity {
 
 
                                 Map messageBodyDetail = new HashMap();
-                                messageBodyDetail.put(messageSenderRef+ "/" + messagePushID, messageImageBody);
-                                messageBodyDetail.put(messageReceiverRef+ "/" + messagePushID, messageImageBody);
+                                messageBodyDetail.put(messageSenderRef + "/" + messagePushID, messageImageBody);
+                                messageBodyDetail.put(messageReceiverRef + "/" + messagePushID, messageImageBody);
 
                                 RootRef.updateChildren(messageBodyDetail);
                                 loadingBar.dismiss();
@@ -307,15 +289,13 @@ public class ChatActivity extends AppCompatActivity {
                 }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
-                        double p = (100.0* taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
+                        double p = (100.0 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
                         loadingBar.setMessage((int) p + " % Uploading...");
                     }
                 });
 
 
-            }
-            else if (checker.equals("image"))
-            {
+            } else if (checker.equals("image")) {
                 StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("Image Files");
 
                 final String messageSenderRef = "Messages/" + messageSenderID + "/" + messageReceiverID;
@@ -332,10 +312,8 @@ public class ChatActivity extends AppCompatActivity {
 
                 uploadTask.continueWithTask(new Continuation() {
                     @Override
-                    public Object then(@NonNull Task task) throws Exception
-                    {
-                        if (!task.isSuccessful())
-                        {
+                    public Object then(@NonNull Task task) throws Exception {
+                        if (!task.isSuccessful()) {
                             throw task.getException();
 
                         }
@@ -343,11 +321,9 @@ public class ChatActivity extends AppCompatActivity {
                     }
                 }).addOnCompleteListener(new OnCompleteListener<Uri>() {
                     @Override
-                    public void onComplete(@NonNull Task <Uri> task)
-                    {
+                    public void onComplete(@NonNull Task<Uri> task) {
 
-                        if (task.isSuccessful())
-                        {
+                        if (task.isSuccessful()) {
                             Uri downloadUrl = task.getResult();
                             myUrl = downloadUrl.toString();
 
@@ -363,19 +339,15 @@ public class ChatActivity extends AppCompatActivity {
 
                             Map messageBodyDetails = new HashMap();
                             messageBodyDetails.put(messageSenderRef + "/" + messagePushID, messageTextBody);
-                            messageBodyDetails.put( messageReceiverRef + "/" + messagePushID, messageTextBody);
+                            messageBodyDetails.put(messageReceiverRef + "/" + messagePushID, messageTextBody);
 
                             RootRef.updateChildren(messageBodyDetails).addOnCompleteListener(new OnCompleteListener() {
                                 @Override
-                                public void onComplete(@NonNull Task task)
-                                {
-                                    if (task.isSuccessful())
-                                    {
+                                public void onComplete(@NonNull Task task) {
+                                    if (task.isSuccessful()) {
                                         loadingBar.dismiss();
                                         Toast.makeText(ChatActivity.this, "Message Sent Successfully...", Toast.LENGTH_SHORT).show();
-                                    }
-                                    else
-                                    {
+                                    } else {
                                         loadingBar.dismiss();
                                         Toast.makeText(ChatActivity.this, "Error", Toast.LENGTH_SHORT).show();
                                     }
@@ -387,39 +359,29 @@ public class ChatActivity extends AppCompatActivity {
                     }
                 });
 
-            }
-            else
-            {
+            } else {
                 loadingBar.dismiss();
                 Toast.makeText(this, "Nothing selected, Error.", Toast.LENGTH_SHORT).show();
             }
         }
     }
 
-    private void DisplayLastSeen()
-    {
+    private void DisplayLastSeen() {
         RootRef.child("Users").child(messageReceiverID)
                 .addValueEventListener(new ValueEventListener() {
                     @Override
-                    public void onDataChange(DataSnapshot dataSnapshot)
-                    {
-                        if (dataSnapshot.child("userState").hasChild("state"))
-                        {
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.child("userState").hasChild("state")) {
                             String state = dataSnapshot.child("userState").child("state").getValue().toString();
                             String date = dataSnapshot.child("userState").child("date").getValue().toString();
                             String time = dataSnapshot.child("userState").child("time").getValue().toString();
 
-                            if (state.equals("online"))
-                            {
+                            if (state.equals("online")) {
                                 userLastSeen.setText("online");
-                            }
-                            else if (state.equals("offline"))
-                            {
+                            } else if (state.equals("offline")) {
                                 userLastSeen.setText("Last Seen: " + date + " " + time);
                             }
-                        }
-                        else
-                        {
+                        } else {
                             userLastSeen.setText("offline");
                         }
                     }
@@ -432,19 +394,12 @@ public class ChatActivity extends AppCompatActivity {
     }
 
 
-
-
-
-    private void SendMessage()
-    {
+    private void SendMessage() {
         String messageText = MessageInputText.getText().toString();
 
-        if (TextUtils.isEmpty(messageText))
-        {
+        if (TextUtils.isEmpty(messageText)) {
             Toast.makeText(this, "first write your message...", Toast.LENGTH_SHORT).show();
-        }
-        else
-        {
+        } else {
             String messageSenderRef = "Messages/" + messageSenderID + "/" + messageReceiverID;
             String messageReceiverRef = "Messages/" + messageReceiverID + "/" + messageSenderID;
 
@@ -464,18 +419,14 @@ public class ChatActivity extends AppCompatActivity {
 
             Map messageBodyDetails = new HashMap();
             messageBodyDetails.put(messageSenderRef + "/" + messagePushID, messageTextBody);
-            messageBodyDetails.put( messageReceiverRef + "/" + messagePushID, messageTextBody);
+            messageBodyDetails.put(messageReceiverRef + "/" + messagePushID, messageTextBody);
 
             RootRef.updateChildren(messageBodyDetails).addOnCompleteListener(new OnCompleteListener() {
                 @Override
-                public void onComplete(@NonNull Task task)
-                {
-                    if (task.isSuccessful())
-                    {
+                public void onComplete(@NonNull Task task) {
+                    if (task.isSuccessful()) {
                         Toast.makeText(ChatActivity.this, "Message Sent Successfully...", Toast.LENGTH_SHORT).show();
-                    }
-                    else
-                    {
+                    } else {
                         Toast.makeText(ChatActivity.this, "Error", Toast.LENGTH_SHORT).show();
                     }
                     MessageInputText.setText("");

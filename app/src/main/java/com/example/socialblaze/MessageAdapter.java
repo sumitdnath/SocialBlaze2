@@ -29,29 +29,24 @@ import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageViewHolder>
-{
+public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageViewHolder> {
     private List<Messages> userMessagesList;
     private FirebaseAuth mAuth;
     private DatabaseReference usersRef;
 
 
-    public MessageAdapter (List<Messages> userMessagesList)
-    {
+    public MessageAdapter(List<Messages> userMessagesList) {
         this.userMessagesList = userMessagesList;
     }
 
 
-
-    public class MessageViewHolder extends RecyclerView.ViewHolder
-    {
+    public class MessageViewHolder extends RecyclerView.ViewHolder {
         public TextView senderMessageText, receiverMessageText;
         public CircleImageView receiverProfileImage;
         public ImageView messageSenderPicture, messageReceiverPicture;
 
 
-        public MessageViewHolder(@NonNull View itemView)
-        {
+        public MessageViewHolder(@NonNull View itemView) {
             super(itemView);
 
             senderMessageText = (TextView) itemView.findViewById(R.id.sender_messsage_text);
@@ -63,12 +58,9 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     }
 
 
-
-
     @NonNull
     @Override
-    public MessageViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i)
-    {
+    public MessageViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         View view = LayoutInflater.from(viewGroup.getContext())
                 .inflate(R.layout.custom_messages_layout, viewGroup, false);
 
@@ -78,10 +70,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     }
 
 
-
     @Override
-    public void onBindViewHolder(@NonNull final MessageViewHolder messageViewHolder, final int position)
-    {
+    public void onBindViewHolder(@NonNull final MessageViewHolder messageViewHolder, final int position) {
         String messageSenderId = mAuth.getCurrentUser().getUid();
         Messages messages = userMessagesList.get(position);
 
@@ -92,10 +82,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
         usersRef.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot)
-            {
-                if (dataSnapshot.hasChild("image"))
-                {
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.hasChild("image")) {
                     String receiverImage = dataSnapshot.child("image").getValue().toString();
 
                     Picasso.get().load(receiverImage).placeholder(R.drawable.profile_image).into(messageViewHolder.receiverProfileImage);
@@ -109,9 +97,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         });
 
 
-
-
-
         messageViewHolder.receiverMessageText.setVisibility(View.GONE);
         messageViewHolder.receiverProfileImage.setVisibility(View.GONE);
         messageViewHolder.senderMessageText.setVisibility(View.GONE);
@@ -119,18 +104,14 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         messageViewHolder.messageReceiverPicture.setVisibility(View.GONE);
 
 
-        if (fromMessageType.equals("text"))
-        {
-            if (fromUserID.equals(messageSenderId))
-            {
+        if (fromMessageType.equals("text")) {
+            if (fromUserID.equals(messageSenderId)) {
                 messageViewHolder.senderMessageText.setVisibility(View.VISIBLE);
 
                 messageViewHolder.senderMessageText.setBackgroundResource(R.drawable.sender_message_layout);
                 messageViewHolder.senderMessageText.setTextColor(Color.BLACK);
                 messageViewHolder.senderMessageText.setText(messages.getMessage() + "\n \n" + messages.getTime() + " - " + messages.getDate());
-            }
-            else
-            {
+            } else {
                 messageViewHolder.receiverProfileImage.setVisibility(View.VISIBLE);
                 messageViewHolder.receiverMessageText.setVisibility(View.VISIBLE);
 
@@ -138,57 +119,41 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                 messageViewHolder.receiverMessageText.setTextColor(Color.BLACK);
                 messageViewHolder.receiverMessageText.setText(messages.getMessage() + "\n \n" + messages.getTime() + " - " + messages.getDate());
             }
-        }
-        else if (fromMessageType.equals("image"))
-        {
-            if (fromUserID.equals(messageSenderId))
-            {
+        } else if (fromMessageType.equals("image")) {
+            if (fromUserID.equals(messageSenderId)) {
                 messageViewHolder.messageSenderPicture.setVisibility(View.VISIBLE);
                 Picasso.get().load(messages.getMessage()).into(messageViewHolder.messageSenderPicture);
+            } else {
+                messageViewHolder.receiverProfileImage.setVisibility(View.VISIBLE);
+                messageViewHolder.messageReceiverPicture.setVisibility(View.VISIBLE);
+                Picasso.get().load(messages.getMessage()).into(messageViewHolder.messageReceiverPicture);
             }
-            else
-                {
-                    messageViewHolder.receiverProfileImage.setVisibility(View.VISIBLE);
-                    messageViewHolder.messageReceiverPicture.setVisibility(View.VISIBLE);
-                    Picasso.get().load(messages.getMessage()).into(messageViewHolder.messageReceiverPicture);
-                }
+        } else if (fromMessageType.equals("pdf") || fromMessageType.equals("docx")) {
+            if (fromUserID.equals(messageSenderId)) {
+                messageViewHolder.messageSenderPicture.setVisibility(View.VISIBLE);
+
+                Picasso.get()
+                        .load("https://firebasestorage.googleapis.com/v0/b/socialblaze-880d2.appspot.com/o/Image%20Files%2Ffile.png?alt=media&token=4732ea5b-72f6-4d43-a7fc-26515c5c09c3")
+                        .into(messageViewHolder.messageSenderPicture);
+
+            } else {
+                messageViewHolder.receiverProfileImage.setVisibility(View.VISIBLE);
+                messageViewHolder.messageReceiverPicture.setVisibility(View.VISIBLE);
+
+                Picasso.get()
+                        .load("https://firebasestorage.googleapis.com/v0/b/socialblaze-880d2.appspot.com/o/Image%20Files%2Ffile.png?alt=media&token=4732ea5b-72f6-4d43-a7fc-26515c5c09c3")
+                        .into(messageViewHolder.messageReceiverPicture);
+
+            }
+
         }
-        else if (fromMessageType.equals("pdf") || fromMessageType.equals("docx"))
-            {
-                if (fromUserID.equals(messageSenderId))
-                {
-                    messageViewHolder.messageSenderPicture.setVisibility(View.VISIBLE);
-
-                    Picasso.get()
-                            .load("https://firebasestorage.googleapis.com/v0/b/socialblaze-880d2.appspot.com/o/Image%20Files%2Ffile.png?alt=media&token=4732ea5b-72f6-4d43-a7fc-26515c5c09c3")
-                            .into(messageViewHolder.messageSenderPicture);
-
-                }
-                else
-                {
-                    messageViewHolder.receiverProfileImage.setVisibility(View.VISIBLE);
-                    messageViewHolder.messageReceiverPicture.setVisibility(View.VISIBLE);
-
-                    Picasso.get()
-                            .load("https://firebasestorage.googleapis.com/v0/b/socialblaze-880d2.appspot.com/o/Image%20Files%2Ffile.png?alt=media&token=4732ea5b-72f6-4d43-a7fc-26515c5c09c3")
-                            .into(messageViewHolder.messageReceiverPicture);
-
-                }
-
-            }
 
 
-
-
-
-        if (fromUserID.equals(messageSenderId))
-        {
+        if (fromUserID.equals(messageSenderId)) {
             messageViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onClick(View v)
-                {
-                    if (userMessagesList.get(position).getType().equals("pdf") || userMessagesList.get(position).getType().equals("docx"))
-                    {
+                public void onClick(View v) {
+                    if (userMessagesList.get(position).getType().equals("pdf") || userMessagesList.get(position).getType().equals("docx")) {
                         CharSequence options[] = new CharSequence[]
                                 {
                                         "Delete For Me",
@@ -202,25 +167,19 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
                         builder.setItems(options, new DialogInterface.OnClickListener() {
                             @Override
-                            public void onClick(DialogInterface dialog, int i)
-                            {
-                              if (i == 0)
-                              {
-                                  deleteSentMessage(position, messageViewHolder);
+                            public void onClick(DialogInterface dialog, int i) {
+                                if (i == 0) {
+                                    deleteSentMessage(position, messageViewHolder);
 
-                                  Intent intent = new Intent(messageViewHolder.itemView.getContext(), MainActivity.class);
-                                  messageViewHolder.itemView.getContext().startActivity(intent);
+                                    Intent intent = new Intent(messageViewHolder.itemView.getContext(), MainActivity.class);
+                                    messageViewHolder.itemView.getContext().startActivity(intent);
 
-                              }
-                               else if (i == 1)
-                                {
+                                } else if (i == 1) {
                                     Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(userMessagesList.get(position).getMessage()));
                                     messageViewHolder.itemView.getContext().startActivity(intent);
 
-                                }
-                                else if (i == 3)
-                                {
-                                    deleteMessageForEveryone(position,messageViewHolder);
+                                } else if (i == 3) {
+                                    deleteMessageForEveryone(position, messageViewHolder);
 
                                     Intent intent = new Intent(messageViewHolder.itemView.getContext(), MainActivity.class);
                                     messageViewHolder.itemView.getContext().startActivity(intent);
@@ -230,10 +189,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                         });
                         builder.show();
 
-                    }
-
-                   else if (userMessagesList.get(position).getType().equals("text"))
-                    {
+                    } else if (userMessagesList.get(position).getType().equals("text")) {
                         CharSequence options[] = new CharSequence[]
                                 {
                                         "Delete For Me",
@@ -246,20 +202,16 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
                         builder.setItems(options, new DialogInterface.OnClickListener() {
                             @Override
-                            public void onClick(DialogInterface dialog, int i)
-                            {
-                                if (i == 0)
-                                {
+                            public void onClick(DialogInterface dialog, int i) {
+                                if (i == 0) {
                                     deleteSentMessage(position, messageViewHolder);
 
                                     Intent intent = new Intent(messageViewHolder.itemView.getContext(), MainActivity.class);
                                     messageViewHolder.itemView.getContext().startActivity(intent);
 
 
-                                }
-                                else if (i == 2)
-                                {
-                                    deleteMessageForEveryone(position,messageViewHolder);
+                                } else if (i == 2) {
+                                    deleteMessageForEveryone(position, messageViewHolder);
 
                                     Intent intent = new Intent(messageViewHolder.itemView.getContext(), MainActivity.class);
                                     messageViewHolder.itemView.getContext().startActivity(intent);
@@ -270,10 +222,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                         });
                         builder.show();
 
-                    }
-
-                    else if (userMessagesList.get(position).getType().equals("image"))
-                    {
+                    } else if (userMessagesList.get(position).getType().equals("image")) {
                         CharSequence options[] = new CharSequence[]
                                 {
                                         "Delete For Me",
@@ -287,28 +236,21 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
                         builder.setItems(options, new DialogInterface.OnClickListener() {
                             @Override
-                            public void onClick(DialogInterface dialog, int i)
-                            {
-                                if (i == 0)
-                                {
+                            public void onClick(DialogInterface dialog, int i) {
+                                if (i == 0) {
                                     deleteSentMessage(position, messageViewHolder);
 
                                     Intent intent = new Intent(messageViewHolder.itemView.getContext(), MainActivity.class);
                                     messageViewHolder.itemView.getContext().startActivity(intent);
 
-                                }
-                                else if (i == 1)
-                                {
+                                } else if (i == 1) {
                                     Intent intent = new Intent(messageViewHolder.itemView.getContext(), ImageViewerActivity.class);
                                     intent.putExtra("url", userMessagesList.get(position).getMessage());
                                     messageViewHolder.itemView.getContext().startActivity(intent);
 
 
-
-                                }
-                                else if (i == 3)
-                                {
-                                    deleteMessageForEveryone(position,messageViewHolder);
+                                } else if (i == 3) {
+                                    deleteMessageForEveryone(position, messageViewHolder);
 
                                     Intent intent = new Intent(messageViewHolder.itemView.getContext(), MainActivity.class);
                                     messageViewHolder.itemView.getContext().startActivity(intent);
@@ -321,16 +263,11 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
                 }
             });
-        }
-
-        else
-        {
+        } else {
             messageViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onClick(View v)
-                {
-                    if (userMessagesList.get(position).getType().equals("pdf") || userMessagesList.get(position).getType().equals("docx"))
-                    {
+                public void onClick(View v) {
+                    if (userMessagesList.get(position).getType().equals("pdf") || userMessagesList.get(position).getType().equals("docx")) {
                         CharSequence options[] = new CharSequence[]
                                 {
                                         "Delete For Me",
@@ -343,18 +280,14 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
                         builder.setItems(options, new DialogInterface.OnClickListener() {
                             @Override
-                            public void onClick(DialogInterface dialog, int i)
-                            {
-                                if (i == 0)
-                                {
+                            public void onClick(DialogInterface dialog, int i) {
+                                if (i == 0) {
                                     deleteReceiveMessage(position, messageViewHolder);
 
                                     Intent intent = new Intent(messageViewHolder.itemView.getContext(), MainActivity.class);
                                     messageViewHolder.itemView.getContext().startActivity(intent);
 
-                                }
-                                else if (i == 1)
-                                {
+                                } else if (i == 1) {
                                     Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(userMessagesList.get(position).getMessage()));
                                     messageViewHolder.itemView.getContext().startActivity(intent);
 
@@ -363,10 +296,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                         });
                         builder.show();
 
-                    }
-
-                    else if (userMessagesList.get(position).getType().equals("text"))
-                    {
+                    } else if (userMessagesList.get(position).getType().equals("text")) {
                         CharSequence options[] = new CharSequence[]
                                 {
                                         "Delete For Me",
@@ -378,10 +308,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
                         builder.setItems(options, new DialogInterface.OnClickListener() {
                             @Override
-                            public void onClick(DialogInterface dialog, int i)
-                            {
-                                if (i == 0)
-                                {
+                            public void onClick(DialogInterface dialog, int i) {
+                                if (i == 0) {
                                     deleteReceiveMessage(position, messageViewHolder);
 
                                     Intent intent = new Intent(messageViewHolder.itemView.getContext(), MainActivity.class);
@@ -392,10 +320,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                         });
                         builder.show();
 
-                    }
-
-                    else if (userMessagesList.get(position).getType().equals("image"))
-                    {
+                    } else if (userMessagesList.get(position).getType().equals("image")) {
                         CharSequence options[] = new CharSequence[]
                                 {
                                         "Delete For Me",
@@ -407,18 +332,14 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
                         builder.setItems(options, new DialogInterface.OnClickListener() {
                             @Override
-                            public void onClick(DialogInterface dialog, int i)
-                            {
-                                if (i == 0)
-                                {
+                            public void onClick(DialogInterface dialog, int i) {
+                                if (i == 0) {
                                     deleteReceiveMessage(position, messageViewHolder);
 
                                     Intent intent = new Intent(messageViewHolder.itemView.getContext(), MainActivity.class);
                                     messageViewHolder.itemView.getContext().startActivity(intent);
 
-                                }
-                                else if (i == 1)
-                                {
+                                } else if (i == 1) {
                                     Intent intent = new Intent(messageViewHolder.itemView.getContext(), ImageViewerActivity.class);
                                     intent.putExtra("url", userMessagesList.get(position).getMessage());
                                     messageViewHolder.itemView.getContext().startActivity(intent);
@@ -439,18 +360,13 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     }
 
 
-
-
     @Override
-    public int getItemCount()
-    {
+    public int getItemCount() {
         return userMessagesList.size();
     }
 
 
-
-    private void deleteSentMessage(final int position, final MessageViewHolder holder)
-    {
+    private void deleteSentMessage(final int position, final MessageViewHolder holder) {
         DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
         rootRef.child("Messages")
                 .child(userMessagesList.get(position).getFrom())
@@ -458,15 +374,11 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                 .child(userMessagesList.get(position).getMessageID())
                 .removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
-            public void onComplete(@NonNull Task<Void> task)
-            {
-            
-                if (task.isSuccessful())
-                {
+            public void onComplete(@NonNull Task<Void> task) {
+
+                if (task.isSuccessful()) {
                     Toast.makeText(holder.itemView.getContext(), "Deleted Successfully.", Toast.LENGTH_SHORT).show();
-                }
-                else
-                {
+                } else {
                     Toast.makeText(holder.itemView.getContext(), "Error Occurred.", Toast.LENGTH_SHORT).show();
 
                 }
@@ -474,8 +386,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         });
     }
 
-    private void deleteReceiveMessage(final int position, final MessageViewHolder holder)
-    {
+    private void deleteReceiveMessage(final int position, final MessageViewHolder holder) {
         DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
         rootRef.child("Messages")
                 .child(userMessagesList.get(position).getTo())
@@ -483,15 +394,11 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                 .child(userMessagesList.get(position).getMessageID())
                 .removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
-            public void onComplete(@NonNull Task<Void> task)
-            {
+            public void onComplete(@NonNull Task<Void> task) {
 
-                if (task.isSuccessful())
-                {
+                if (task.isSuccessful()) {
                     Toast.makeText(holder.itemView.getContext(), "Deleted Successfully.", Toast.LENGTH_SHORT).show();
-                }
-                else
-                {
+                } else {
                     Toast.makeText(holder.itemView.getContext(), "Error Occurred.", Toast.LENGTH_SHORT).show();
 
                 }
@@ -500,9 +407,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     }
 
 
-
-    private void deleteMessageForEveryone(final int position, final MessageViewHolder holder)
-    {
+    private void deleteMessageForEveryone(final int position, final MessageViewHolder holder) {
         final DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
         rootRef.child("Messages")
                 .child(userMessagesList.get(position).getTo())
@@ -510,29 +415,23 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                 .child(userMessagesList.get(position).getMessageID())
                 .removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
-            public void onComplete(@NonNull Task<Void> task)
-            {
+            public void onComplete(@NonNull Task<Void> task) {
 
-                if (task.isSuccessful())
-                {
+                if (task.isSuccessful()) {
                     rootRef.child("Messages")
                             .child(userMessagesList.get(position).getFrom())
                             .child(userMessagesList.get(position).getTo())
                             .child(userMessagesList.get(position).getMessageID())
                             .removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
-                        public void onComplete(@NonNull Task<Void> task)
-                        {
-                            if (task.isSuccessful())
-                            {
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
                                 Toast.makeText(holder.itemView.getContext(), "Deleted Successfully.", Toast.LENGTH_SHORT).show();
 
                             }
                         }
                     });
-                }
-                else
-                {
+                } else {
                     Toast.makeText(holder.itemView.getContext(), "Error Occurred.", Toast.LENGTH_SHORT).show();
 
                 }

@@ -3,7 +3,7 @@ package com.example.socialblaze;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import  androidx.appcompat.widget.Toolbar;
+import androidx.appcompat.widget.Toolbar;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -54,8 +54,7 @@ public class SettingsActivity extends AppCompatActivity {
 
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
@@ -74,8 +73,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         UpdateAccountSettings.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view)
-            {
+            public void onClick(View view) {
                 UpdateSettings();
             }
         });
@@ -85,8 +83,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         userProfileImage.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view)
-            {
+            public void onClick(View view) {
                 Intent galleryIntent = new Intent();
                 galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
                 galleryIntent.setType("image/*");
@@ -96,10 +93,7 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
 
-
-
-    private void InitializeFields()
-    {
+    private void InitializeFields() {
         UpdateAccountSettings = (Button) findViewById(R.id.update_settings_button);
         userName = (EditText) findViewById(R.id.set_user_name);
         userStatus = (EditText) findViewById(R.id.set_profile_status);
@@ -116,12 +110,10 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data)
-    {
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode==GalleryPick  &&  resultCode==RESULT_OK  &&  data!=null)
-        {
+        if (requestCode == GalleryPick && resultCode == RESULT_OK && data != null) {
             Uri ImageUri = data.getData();
 
             CropImage.activity()
@@ -130,12 +122,10 @@ public class SettingsActivity extends AppCompatActivity {
                     .start(this);
         }
 
-        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE)
-        {
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
 
-            if (resultCode == RESULT_OK)
-            {
+            if (resultCode == RESULT_OK) {
                 loadingBar.setTitle("Set Profile Image");
                 loadingBar.setMessage("Please wait, your profile image is updating...");
                 loadingBar.setCanceledOnTouchOutside(false);
@@ -177,23 +167,16 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
 
-
-
-    private void UpdateSettings()
-    {
+    private void UpdateSettings() {
         String setUserName = userName.getText().toString();
         String setStatus = userStatus.getText().toString();
 
-        if (TextUtils.isEmpty(setUserName))
-        {
+        if (TextUtils.isEmpty(setUserName)) {
             Toast.makeText(this, "Please write your user name first....", Toast.LENGTH_SHORT).show();
         }
-        if (TextUtils.isEmpty(setStatus))
-        {
+        if (TextUtils.isEmpty(setStatus)) {
             Toast.makeText(this, "Please write your status....", Toast.LENGTH_SHORT).show();
-        }
-        else
-        {
+        } else {
             HashMap<String, Object> profileMap = new HashMap<>();
             profileMap.put("uid", currentUserID);
             profileMap.put("name", setUserName);
@@ -201,15 +184,11 @@ public class SettingsActivity extends AppCompatActivity {
             RootRef.child("Users").child(currentUserID).updateChildren(profileMap)
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
-                        public void onComplete(@NonNull Task<Void> task)
-                        {
-                            if (task.isSuccessful())
-                            {
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
                                 SendUserToMainActivity();
                                 Toast.makeText(SettingsActivity.this, "Profile Updated Successfully...", Toast.LENGTH_SHORT).show();
-                            }
-                            else
-                            {
+                            } else {
                                 String message = task.getException().toString();
                                 Toast.makeText(SettingsActivity.this, "Error: " + message, Toast.LENGTH_SHORT).show();
                             }
@@ -219,16 +198,12 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
 
-
-    private void RetrieveUserInfo()
-    {
+    private void RetrieveUserInfo() {
         RootRef.child("Users").child(currentUserID)
                 .addValueEventListener(new ValueEventListener() {
                     @Override
-                    public void onDataChange(DataSnapshot dataSnapshot)
-                    {
-                        if ((dataSnapshot.exists()) && (dataSnapshot.hasChild("name") && (dataSnapshot.hasChild("image"))))
-                        {
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if ((dataSnapshot.exists()) && (dataSnapshot.hasChild("name") && (dataSnapshot.hasChild("image")))) {
                             String retrieveUserName = dataSnapshot.child("name").getValue().toString();
                             String retrievesStatus = dataSnapshot.child("status").getValue().toString();
                             String retrieveProfileImage = dataSnapshot.child("image").getValue().toString();
@@ -236,17 +211,13 @@ public class SettingsActivity extends AppCompatActivity {
                             userName.setText(retrieveUserName);
                             userStatus.setText(retrievesStatus);
                             Picasso.get().load(retrieveProfileImage).into(userProfileImage);
-                        }
-                        else if ((dataSnapshot.exists()) && (dataSnapshot.hasChild("name")))
-                        {
+                        } else if ((dataSnapshot.exists()) && (dataSnapshot.hasChild("name"))) {
                             String retrieveUserName = dataSnapshot.child("name").getValue().toString();
                             String retrievesStatus = dataSnapshot.child("status").getValue().toString();
 
                             userName.setText(retrieveUserName);
                             userStatus.setText(retrievesStatus);
-                        }
-                        else
-                        {
+                        } else {
                             userName.setVisibility(View.VISIBLE);
                             Toast.makeText(SettingsActivity.this, "Please set & update your profile information...", Toast.LENGTH_SHORT).show();
                         }
@@ -260,11 +231,7 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
 
-
-
-
-    private void SendUserToMainActivity()
-    {
+    private void SendUserToMainActivity() {
         Intent mainIntent = new Intent(SettingsActivity.this, MainActivity.class);
         mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(mainIntent);

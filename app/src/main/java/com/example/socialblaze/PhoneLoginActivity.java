@@ -42,8 +42,6 @@ public class PhoneLoginActivity extends AppCompatActivity {
     private ProgressDialog loadingbar;
 
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,72 +50,61 @@ public class PhoneLoginActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         loadingbar = new ProgressDialog(this);
 
-    phoneText = findViewById(R.id.phoneText);
-    codeText = findViewById(R.id.codeText);
-    continueAndNextBtn = findViewById(R.id.continueNextButton);
-    relativeLayout = findViewById(R.id.phoneAuth);
-    ccp = (CountryCodePicker)findViewById(R.id.ccp);
-    ccp.registerCarrierNumberEditText(phoneText);
+        phoneText = findViewById(R.id.phoneText);
+        codeText = findViewById(R.id.codeText);
+        continueAndNextBtn = findViewById(R.id.continueNextButton);
+        relativeLayout = findViewById(R.id.phoneAuth);
+        ccp = (CountryCodePicker) findViewById(R.id.ccp);
+        ccp.registerCarrierNumberEditText(phoneText);
 
 
-    continueAndNextBtn.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            if (continueAndNextBtn.getText().equals("Submit") || checker.equals("Code Sent"))
-            {
-                String verificationCode = codeText.getText().toString();
+        continueAndNextBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (continueAndNextBtn.getText().equals("Submit") || checker.equals("Code Sent")) {
+                    String verificationCode = codeText.getText().toString();
 
-                if (verificationCode.equals(""))
-                {
-                    Toast.makeText(PhoneLoginActivity.this, "Please Write The Verification Code First.", Toast.LENGTH_SHORT).show();
+                    if (verificationCode.equals("")) {
+                        Toast.makeText(PhoneLoginActivity.this, "Please Write The Verification Code First.", Toast.LENGTH_SHORT).show();
+
+                    } else {
+                        loadingbar.setTitle("Verification Code");
+                        loadingbar.setMessage("please wait, while we are verifying verification code...");
+                        loadingbar.setCanceledOnTouchOutside(false);
+                        loadingbar.show();
+
+                        PhoneAuthCredential credential = PhoneAuthProvider.getCredential(mVerificationId, verificationCode);
+                        signInWithPhoneAuthCredential(credential);
+
+                    }
+
+                } else {
+                    phoneNumber = ccp.getFullNumberWithPlus();
+                    if (!phoneNumber.equals("")) {
+                        loadingbar.setTitle("Phone Number Verification");
+                        loadingbar.setMessage("please wait, while we are authenticating your phone...");
+                        loadingbar.setCanceledOnTouchOutside(false);
+                        loadingbar.show();
+
+                        PhoneAuthProvider.getInstance().verifyPhoneNumber(phoneNumber, 60, TimeUnit.SECONDS, PhoneLoginActivity.this, mCallbacks);        // OnVerificationStateChangedCallbacks
+
+                    } else {
+                        Toast.makeText(PhoneLoginActivity.this, "Please Write Valid Phone Number..", Toast.LENGTH_SHORT).show();
+                    }
 
                 }
-                else
-                {
-                    loadingbar.setTitle("Verification Code");
-                    loadingbar.setMessage("please wait, while we are verifying verification code...");
-                    loadingbar.setCanceledOnTouchOutside(false);
-                    loadingbar.show();
-
-                    PhoneAuthCredential credential = PhoneAuthProvider.getCredential(mVerificationId, verificationCode);
-                    signInWithPhoneAuthCredential(credential);
-
-                }
-
             }
-            else
-            {
-                phoneNumber = ccp.getFullNumberWithPlus();
-                if (!phoneNumber.equals(""))
-                {
-                    loadingbar.setTitle("Phone Number Verification");
-                    loadingbar.setMessage("please wait, while we are authenticating your phone...");
-                    loadingbar.setCanceledOnTouchOutside(false);
-                    loadingbar.show();
-
-                    PhoneAuthProvider.getInstance().verifyPhoneNumber(phoneNumber,60, TimeUnit.SECONDS,PhoneLoginActivity.this,mCallbacks);        // OnVerificationStateChangedCallbacks
-
-                }
-                else
-                {
-                    Toast.makeText(PhoneLoginActivity.this, "Please Write Valid Phone Number..", Toast.LENGTH_SHORT).show();
-                }
-
-            }
-        }
-    });
+        });
 
         mCallbacks = new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
             @Override
-            public void onVerificationCompleted(PhoneAuthCredential phoneAuthCredential)
-            {
+            public void onVerificationCompleted(PhoneAuthCredential phoneAuthCredential) {
                 signInWithPhoneAuthCredential(phoneAuthCredential);
 
             }
 
             @Override
-            public void onVerificationFailed(FirebaseException e)
-            {
+            public void onVerificationFailed(FirebaseException e) {
                 Toast.makeText(PhoneLoginActivity.this, "Invalid Phone number", Toast.LENGTH_SHORT).show();
                 loadingbar.dismiss();
                 relativeLayout.setVisibility(View.VISIBLE);
@@ -133,7 +120,7 @@ public class PhoneLoginActivity extends AppCompatActivity {
 
                 mVerificationId = s;
                 mResendingToken = forceResendingToken;
-                
+
 
                 relativeLayout.setVisibility(View.GONE);
 
@@ -156,14 +143,12 @@ public class PhoneLoginActivity extends AppCompatActivity {
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful())
-                        {
+                        if (task.isSuccessful()) {
                             loadingbar.dismiss();
                             sendUserToMainActivity();
 
 
-                        } else
-                        {
+                        } else {
                             loadingbar.dismiss();
                             String e = task.getException().toString();
                             Toast.makeText(PhoneLoginActivity.this, "Error: " + e, Toast.LENGTH_SHORT).show();
@@ -172,8 +157,7 @@ public class PhoneLoginActivity extends AppCompatActivity {
                 });
     }
 
-    private  void sendUserToMainActivity()
-    {
+    private void sendUserToMainActivity() {
         Intent intent = new Intent(PhoneLoginActivity.this, MainActivity.class);
         startActivity(intent);
         finish();

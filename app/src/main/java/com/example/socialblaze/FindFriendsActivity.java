@@ -12,7 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import  androidx.appcompat.widget.Toolbar;
+import androidx.appcompat.widget.Toolbar;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
@@ -29,10 +29,8 @@ public class FindFriendsActivity extends AppCompatActivity {
     private DatabaseReference UserRef;
 
 
-
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_find_friends);
 
@@ -50,8 +48,7 @@ public class FindFriendsActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onStart()
-    {
+    protected void onStart() {
         super.onStart();
 
         FirebaseRecyclerOptions<Contacts> options =
@@ -62,16 +59,14 @@ public class FindFriendsActivity extends AppCompatActivity {
         FirebaseRecyclerAdapter<Contacts, FindFriendViewHolder> adapter =
                 new FirebaseRecyclerAdapter<Contacts, FindFriendViewHolder>(options) {
                     @Override
-                    protected void onBindViewHolder(@NonNull FindFriendViewHolder holder, final int position, @NonNull Contacts model)
-                    {
+                    protected void onBindViewHolder(@NonNull FindFriendViewHolder holder, final int position, @NonNull Contacts model) {
                         holder.userName.setText(model.getName());
                         holder.userStatus.setText(model.getStatus());
                         Picasso.get().load(model.getImage()).placeholder(R.drawable.profile_image).into(holder.profileImage);
 
                         holder.itemView.setOnClickListener(new View.OnClickListener() {
                             @Override
-                            public void onClick(View v)
-                            {
+                            public void onClick(View v) {
 
                                 String visit_user_id = getRef(position).getKey();
                                 Intent profileIntent = new Intent(FindFriendsActivity.this, ProfileActivity.class);
@@ -85,8 +80,7 @@ public class FindFriendsActivity extends AppCompatActivity {
 
                     @NonNull
                     @Override
-                    public FindFriendViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i)
-                    {
+                    public FindFriendViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
                         View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.users_display_layout, viewGroup, false);
                         FindFriendViewHolder viewHolder = new FindFriendViewHolder(view);
                         return viewHolder;
@@ -97,14 +91,12 @@ public class FindFriendsActivity extends AppCompatActivity {
         adapter.startListening();
     }
 
-    public static class FindFriendViewHolder extends RecyclerView.ViewHolder
-    {
+    public static class FindFriendViewHolder extends RecyclerView.ViewHolder {
         TextView userName, userStatus;
         CircleImageView profileImage;
 
 
-        public FindFriendViewHolder(@NonNull View itemView)
-        {
+        public FindFriendViewHolder(@NonNull View itemView) {
             super(itemView);
 
             userName = itemView.findViewById(R.id.user_profile_name);

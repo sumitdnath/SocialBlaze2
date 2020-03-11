@@ -37,7 +37,7 @@ public class ChatFragment extends Fragment {
 
     private DatabaseReference ChatsRef, UsersRef;
     private FirebaseAuth mAuth;
-    private String currentUserID="";
+    private String currentUserID = "";
 
 
     public ChatFragment() {
@@ -67,8 +67,7 @@ public class ChatFragment extends Fragment {
 
 
     @Override
-    public void onStart()
-    {
+    public void onStart() {
         super.onStart();
 
 
@@ -81,19 +80,15 @@ public class ChatFragment extends Fragment {
         FirebaseRecyclerAdapter<Contacts, ChatsViewHolder> adapter =
                 new FirebaseRecyclerAdapter<Contacts, ChatsViewHolder>(options) {
                     @Override
-                    protected void onBindViewHolder(@NonNull final ChatsViewHolder holder, int position, @NonNull Contacts model)
-                    {
+                    protected void onBindViewHolder(@NonNull final ChatsViewHolder holder, int position, @NonNull Contacts model) {
                         final String usersIDs = getRef(position).getKey();
                         final String[] retImage = {"default_image"};
 
                         UsersRef.child(usersIDs).addValueEventListener(new ValueEventListener() {
                             @Override
-                            public void onDataChange(DataSnapshot dataSnapshot)
-                            {
-                                if (dataSnapshot.exists())
-                                {
-                                    if (dataSnapshot.hasChild("image"))
-                                    {
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                if (dataSnapshot.exists()) {
+                                    if (dataSnapshot.hasChild("image")) {
                                         retImage[0] = dataSnapshot.child("image").getValue().toString();
                                         Picasso.get().load(retImage[0]).into(holder.profileImage);
                                     }
@@ -104,30 +99,23 @@ public class ChatFragment extends Fragment {
                                     holder.userName.setText(retName);
 
 
-                                    if (dataSnapshot.child("userState").hasChild("state"))
-                                    {
+                                    if (dataSnapshot.child("userState").hasChild("state")) {
                                         String state = dataSnapshot.child("userState").child("state").getValue().toString();
                                         String date = dataSnapshot.child("userState").child("date").getValue().toString();
                                         String time = dataSnapshot.child("userState").child("time").getValue().toString();
 
-                                        if (state.equals("online"))
-                                        {
+                                        if (state.equals("online")) {
                                             holder.userStatus.setText("online");
-                                        }
-                                        else if (state.equals("offline"))
-                                        {
+                                        } else if (state.equals("offline")) {
                                             holder.userStatus.setText("Last Seen: " + date + " " + time);
                                         }
-                                    }
-                                    else
-                                    {
+                                    } else {
                                         holder.userStatus.setText("offline");
                                     }
 
                                     holder.itemView.setOnClickListener(new View.OnClickListener() {
                                         @Override
-                                        public void onClick(View view)
-                                        {
+                                        public void onClick(View view) {
                                             Intent chatIntent = new Intent(getContext(), ChatActivity.class);
                                             chatIntent.putExtra("visit_user_id", usersIDs);
                                             chatIntent.putExtra("visit_user_name", retName);
@@ -147,8 +135,7 @@ public class ChatFragment extends Fragment {
 
                     @NonNull
                     @Override
-                    public ChatsViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i)
-                    {
+                    public ChatsViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
                         View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.users_display_layout, viewGroup, false);
                         return new ChatsViewHolder(view);
                     }
@@ -159,16 +146,12 @@ public class ChatFragment extends Fragment {
     }
 
 
-
-
-    public static class  ChatsViewHolder extends RecyclerView.ViewHolder
-    {
+    public static class ChatsViewHolder extends RecyclerView.ViewHolder {
         CircleImageView profileImage;
         TextView userStatus, userName;
 
 
-        public ChatsViewHolder(@NonNull View itemView)
-        {
+        public ChatsViewHolder(@NonNull View itemView) {
             super(itemView);
 
             profileImage = itemView.findViewById(R.id.users_profile_image);

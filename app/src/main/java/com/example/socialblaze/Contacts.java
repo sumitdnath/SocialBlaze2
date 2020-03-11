@@ -5,8 +5,7 @@ import android.provider.ContactsContract;
 public class Contacts {
     public String name, status, image;
 
-    public Contacts()
-    {
+    public Contacts() {
 
     }
 
